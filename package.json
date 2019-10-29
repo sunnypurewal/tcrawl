@@ -1,6 +1,6 @@
 {
   "name": "tcrawl",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Command Line Interface for Turbo Crawl",
   "bin": {
     "tcrawl": "build/cli.js"
@@ -35,6 +35,6 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "hittp": "^0.5.6",
-    "turbocrawl": "file:../turbocrawl_"
+    "turbocrawl": "^0.2.11"
   }
 }
