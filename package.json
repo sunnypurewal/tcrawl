@@ -35,6 +35,6 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "hittp": "^0.5.6",
-    "turbocrawl": "^0.2.11"
+    "turbocrawl": "file:../turbocrawl_"
   }
 }
