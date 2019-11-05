@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
-    "hittp": "^0.5.6",
+    "hittp": "file:../hittp",
     "turbocrawl": "file:../turbocrawl_"
   }
 }

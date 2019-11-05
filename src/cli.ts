@@ -16,16 +16,15 @@ if (process.argv.length <= 2) {
       log(`
 ${chalk.underline(`${NAME} ${VERSION}`)}
 
-  Here are some commands to get you started:
+${chalk.blueBright("Here are some commands to get you started:")}
 
-${chalk.reset("$ tcrawl start")}    ${chalk.inverse("You probably want to do this first.")}
-  ${chalk.reset("$ tcrawl start &")}    ${chalk.inverse("Starts the server in the background")}
-
-${chalk.reset("$ tcrawl generate")} ${chalk.inverse("Generates lists of websites for Turbo Crawl to visit.")}
-
-${chalk.reset("$ tcrawl crawl")}    ${chalk.inverse("Begins crawling one or more websites")}
-
-${chalk.reset("$ tcrawl help")}     ${chalk.inverse("Show a list of all commands")}
+1$ ${chalk.reset("tcrawl start &")}  | You probably want to do this first.
+                   |
+2$ ${chalk.reset("tcrawl generate")} | Generates lists of websites for Turbo Crawl to visit.
+                   |
+3$ ${chalk.reset("tcrawl crawl")}    | Begins crawling one or more websites.
+                   |
+4$ ${chalk.reset("tcrawl help")}     | Show a list of all commands.
         `)
     } else {
       log(`
@@ -55,7 +54,7 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
     } else if (command === "list") {
       commands.list(PORT, HOST, (crawlerstrings) => {
         log(`
-    Crawlers:
+    ${chalk.blueBright("Crawlers:")}
       ${crawlerstrings.length > 0 ? crawlerstrings.join("\n\t\t") : "None. You can use the following command to start a crawl:\n\ttcrawl www.someurlhere.com"}`)
       })
     } else if (command === "pause") {
@@ -100,21 +99,33 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
         log(chalk.blueBright("\nThe generate command:")
         + "\nAutomatically generates lists of websites to be crawled"
         + "\n  tcrawl generate reddit\n    Scrapes news websites from " + chalk.bold.underline("https://www.reddit.com/r/politics/wiki/whitelist")
-        + "\n  tcrawl generate nationalnews\n    Scrapes national news websites from "
+        + "\n  tcrawl generate wikipedia\n    Scrapes national news websites from "
         + chalk.bold.underline("https://en.wikipedia.org/wiki/Category:News_websites_by_country"))
       } else if (arg === "reddit") {
         log("Scraping", chalk.bold.underline("https://www.reddit.com/r/politics/wiki/whitelist"), "for domain names")
-        commands.genreddit((count, filename) => {
-          log(count > 0 ?
-            chalk.greenBright(`Scraped ${count} domain names into ${filename}`)
+        commands.generate(PORT, HOST, "reddit", (body, err) => {
+          let json: any = body || ""
+          try { json = JSON.parse(json) }
+          catch { 
+            log(chalk.redBright("Failed to scrape anything"))
+            return
+          }
+          log(json.count > 0 ?
+            chalk.greenBright(`Scraped ${json.count} domain names into ${json.filename}`)
             : chalk.redBright("Failed to scrape anything."))
         })
-      } else if (arg === "nationalnews") {
+      } else if (arg === "wikipedia") {
         log("Scraping", chalk.bold.underline("https://en.wikipedia.org/wiki/Category:News_websites_by_country"), "for domain names")
-        commands.gencountries((count) => {
-          log(count > 0 ?
+        commands.generate(PORT, HOST, "wikipedia", (body, err) => {
+          let json: any = body || ""
+          try { json = JSON.parse(json) }
+          catch {
+            log(chalk.redBright("Failed to scrape anything"))
+            return
+          }
+          log(json.count > 0 ?
             chalk.greenBright(`
-    Scraped ${count} domain names from Wikipedia Category: ${chalk.bold("News websites by country")}`)
+    Scraped ${json.count} domain names from Wikipedia Category: ${chalk.bold("News websites by country")}`)
             : chalk.redBright(`
     Failed to scrape anything from Wikipedia Category: ${chalk.bold("News websites by country")}`))
         })
