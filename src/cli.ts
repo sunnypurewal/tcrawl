@@ -112,6 +112,8 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
           }
           log(json.count > 0 ?
             chalk.greenBright(`Scraped ${json.count} domain names into ${json.filename}`)
+            + "\n  tcrawl crawl random"
+            + "\n    Try the above command to randomly crawl a website from this list."
             : chalk.redBright("Failed to scrape anything."))
         })
       } else if (arg === "wikipedia") {
@@ -141,8 +143,14 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
         + "\n  tcrawl crawl -f filename\n    Pass in a newline-delimited file of URLs to crawl.\n    That means one URL per line.")
       }
       if (arg === "random") {
-        commands.random(PORT, HOST, (url) => {
-          log((url ? chalk.greenBright(`Randomly selected ${url.href} for crawling`) : chalk.redBright("Turbo Crawl failed to random crawl")))
+        commands.random(PORT, HOST, (statusCode, url) => {
+          if (statusCode === 404) {
+            log(chalk.redBright("You'll need to run the generate command first to build a list of URLs from which to randomly select:")
+            + "\n  tcrawl generate reddit\n    Scrapes news websites from " + chalk.bold.underline("https://www.reddit.com/r/politics/wiki/whitelist")
+            )
+          } else if (url) {
+            log(chalk.greenBright(`Randomly selected ${url.href} for crawling`))
+          }
         })
       } else if (arg === "-f") {
         arg = process.argv[4]
