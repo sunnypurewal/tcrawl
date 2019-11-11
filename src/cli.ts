@@ -117,7 +117,9 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
             : chalk.redBright("Failed to scrape anything."))
         })
       } else if (arg === "wikipedia") {
-        log("Scraping", chalk.bold.underline("https://en.wikipedia.org/wiki/Category:News_websites_by_country"), "for domain names")
+        log("Scraping" + chalk.bold.underline("https://en.wikipedia.org/wiki/Category:News_websites_by_country") + " for domain names"
+        + "\nThis will take about 8 minutes. You can ctrl+c out of here if you want and the generation will continue on the server."
+        )
         commands.generate(PORT, HOST, "wikipedia", (body, err) => {
           let json: any = body || ""
           try { json = JSON.parse(json) }
@@ -140,7 +142,7 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
         + "\n  tcrawl crawl www.replacethiswitharealwebsite.com\n    Begins crawling the website sent in as an argument. See server for logs."
         + "\n  tcrawl crawl random\n    Crawls a random news website."
         + "\n  tcrawl crawl american\n    Crawls popular American news websites. Link to full list of countries: https://en.wikipedia.org/wiki/Category:News_websites_by_country"
-        + "\n  tcrawl crawl -f filename\n    Pass in a newline-delimited file of URLs to crawl.\n    That means one URL per line.")
+        + "\n  tcrawl crawl -f filename\n    Pass in a newline-delimited file of domain names to crawl.\n    That means one domain name per line.")
       }
       if (arg === "random") {
         commands.random(PORT, HOST, (statusCode, url) => {
@@ -164,7 +166,7 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
         } else {
           log("Pass a file with a list of domains to tcrawl using the -f option")
         }
-      } else {
+      } else if (arg) {
         const url = str2url(arg)
         if (url) {
           commands.crawl(PORT, HOST, [url], ((success, err) => {
@@ -175,8 +177,14 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
             }
           }))
         } else {
-          commands.crawlNational(PORT, HOST, arg.toLowerCase(), () => {
-            log(`Turbo Crawl will crawl ${chalk.greenBright(arg)} news` )
+          commands.crawlNational(PORT, HOST, arg.toLowerCase(), (statusCode) => {
+            if (statusCode === 404) {
+              log(chalk.redBright("You'll need to run the generate command first to build a list of national news sites:")
+              + "\n  tcrawl generate wikipedia\n    Scrapes national news websites from "
+              + chalk.bold.underline("https://en.wikipedia.org/wiki/Category:News_websites_by_country"))
+            } else if (url) {
+              log(`Turbo Crawl will crawl ${chalk.greenBright(arg)} news` )
+            }
           })
         }
       }
