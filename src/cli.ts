@@ -145,13 +145,16 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
         + "\n  tcrawl crawl -f filename\n    Pass in a newline-delimited file of domain names to crawl.\n    That means one domain name per line.")
       }
       if (arg === "random") {
-        commands.random(PORT, HOST, (statusCode, url) => {
+        commands.random(PORT, HOST, (statusCode, response) => {
           if (statusCode === 404) {
             log(chalk.redBright("You'll need to run the generate command first to build a list of URLs from which to randomly select:")
             + "\n  tcrawl generate reddit\n    Scrapes news websites from " + chalk.bold.underline("https://www.reddit.com/r/politics/wiki/whitelist")
             )
-          } else if (url) {
-            log(chalk.greenBright(`Randomly selected ${url.href} for crawling`))
+          } else if (response.url) {
+            log("Randomly selected " + chalk.greenBright(response.url) + " for crawling.")
+            if (response.filepath) {
+              log("Scraper output can be found on the server at " + chalk.greenBright(response.filepath))
+            }
           }
         })
       } else if (arg === "-f") {
