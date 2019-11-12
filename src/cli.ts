@@ -36,7 +36,17 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
 } else {
   const url = str2url(process.argv[2])
   if (url) {
-    commands.crawl(PORT, HOST, [url])
+    commands.crawl(PORT, HOST, [url], (statusCode, response) => {
+      if (statusCode === 400) {
+        log(`Error crawling ${chalk.red(url.href)}`)
+      }
+      else {
+        log(`Crawling ${chalk.greenBright(url.href)}`)
+        if (response.filepath) {
+          log("Scraper output can be found on the server at " + chalk.greenBright(response.filepath))
+        }
+      }
+    })
   } else {
     const command = process.argv[2]
     if (command === "start") {
@@ -172,21 +182,28 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
       } else if (arg) {
         const url = str2url(arg)
         if (url) {
-          commands.crawl(PORT, HOST, [url], ((success, err) => {
-            if (success) {
-              log(`Crawling ${chalk.bold(url.href)}`)
-            } else if (err) {
-              log(`Error crawling ${chalk.bold(url.href)} ${err.message}`)
+          commands.crawl(PORT, HOST, [url], (statusCode, response) => {
+            if (statusCode === 400) {
+              log(`Error crawling ${chalk.red(url.href)}`)
             }
-          }))
+            else {
+              log(`Crawling ${chalk.greenBright(url.href)}`)
+              if (response.filepath) {
+                log("Scraper output can be found on the server at " + chalk.greenBright(response.filepath))
+              }
+            }
+          })
         } else {
-          commands.crawlNational(PORT, HOST, arg.toLowerCase(), (statusCode) => {
+          commands.crawlNational(PORT, HOST, arg.toLowerCase(), (statusCode, response) => {
             if (statusCode === 404) {
               log(chalk.redBright("You'll need to run the generate command first to build a list of national news sites:")
               + "\n  tcrawl generate wikipedia\n    Scrapes national news websites from "
               + chalk.bold.underline("https://en.wikipedia.org/wiki/Category:News_websites_by_country"))
             } else if (url) {
               log(`Turbo Crawl will crawl ${chalk.greenBright(arg)} news` )
+              if (response.filepath) {
+                log("Scraper output can be found on the server at " + chalk.greenBright(response.filepath))
+              }
             }
           })
         }
