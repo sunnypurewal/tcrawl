@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const VERSION = "v0.1.0"
+const VERSION = "0.3.1"
 const NAME = "Turbo Crawl"
 import chalk from "chalk"
 import { readFileSync } from "fs"
@@ -18,13 +18,13 @@ ${chalk.underline(`${NAME} ${VERSION}`)}
 
 ${chalk.blueBright("Here are some commands to get you started:")}
 
-1$ ${chalk.reset("tcrawl start &")}  | You probably want to do this first.
-                   |
-2$ ${chalk.reset("tcrawl generate")} | Generates lists of websites for Turbo Crawl to visit.
-                   |
-3$ ${chalk.reset("tcrawl crawl")}    | Begins crawling one or more websites.
-                   |
-4$ ${chalk.reset("tcrawl help")}     | Show a list of all commands.
+$ ${chalk.reset("tcrawl start &")}  | You probably want to do this first.
+                  |
+$ ${chalk.reset("tcrawl generate")} | Generates lists of websites for Turbo Crawl to visit.
+                  |
+$ ${chalk.reset("tcrawl crawl")}    | Begins crawling one or more websites.
+                  |
+$ ${chalk.reset("tcrawl help")}     | Show a list of all commands.
         `)
     } else {
       log(`
@@ -103,7 +103,14 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
             : chalk.redBright("Turbo Crawl failed to resume")), url.href)
         })
       }
-    } else if (command === "generate") {
+    } else if (command === "resumeall") {
+      commands.resumeall(PORT, HOST, (success) => {
+        log((success ?
+          chalk.greenBright("Turbo Crawl resume all crawlers")
+          : chalk.redBright("Turbo Crawl failed to resume all crawlers")))
+      })
+    }
+    else if (command === "generate") {
       const arg = process.argv[3]
       if (!arg || arg.length === 0) {
         log(chalk.blueBright("\nThe generate command:")
@@ -180,6 +187,7 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
           log("Pass a file with a list of domains to tcrawl using the -f option")
         }
       } else if (arg) {
+        // argument exists but we haven't handled yet
         const url = str2url(arg)
         if (url) {
           commands.crawl(PORT, HOST, [url], (statusCode, response) => {
@@ -208,6 +216,25 @@ ${chalk.reset("$ tcrawl crawl cnn.com")}
           })
         }
       }
-    }
+    } else if (command === "help") {
+      log(
+`
+$ ${chalk.reset("tcrawl crawl")}              | Begins crawling one or more websites.
+                            |
+$ ${chalk.reset("tcrawl end <domain>")}       | Ends crawling of specified website
+                            |
+$ ${chalk.reset("tcrawl endall")}             | Ends all crawlers
+                            |
+$ ${chalk.reset("tcrawl generate")}           | Generates lists of websites for Turbo Crawl to visit.
+                            |
+$ ${chalk.reset("tcrawl list")}               | List all active crawlers
+                            |
+$ ${chalk.reset("tcrawl shutdown")}           | Stops the Turbo Crawl server
+                            |
+$ ${chalk.reset("tcrawl start")}              | Starts the Turbo Crawl server
+                            |
+
+`)
+    } 
   }
 }
