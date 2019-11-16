@@ -1,6 +1,6 @@
 {
   "name": "tcrawl",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Command Line Interface for Turbo Crawl",
   "bin": {
     "tcrawl": "build/cli.js"
